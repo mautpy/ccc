@@ -2,7 +2,7 @@ import os
 import asyncio
 from pyrogram import Client, filters
 from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
-
+from pyrogram.types import ForceReply
 API_ID = 22625636  # Replace with your API ID
 API_HASH = "f71778a6e1e102f33ccc4aee3b5cc697"  # Replace with your API Hash
 BOT_TOKEN = "7821220674:AAE9tWHbpxxbEOajtnPWXv7WsAbS3UG4Ly0"  # Replace with your bot token
@@ -46,8 +46,21 @@ async def check_channel(client, callback_query):
     else:
         await callback_query.answer("❌ You haven't joined the channel yet!", show_alert=True)
 
-# Host Python script
+
+
+# Step 1: Ask user to send a .py file
 @app.on_message(filters.command("host"))
+async def ask_for_file(client, message):
+    user_id = message.from_user.id
+
+    if not await is_user_joined(client, user_id):
+        await message.reply_text("❌ **You must join the channel first!**")
+        return
+
+    await message.reply_text("📂 **Send the .py file you want to host.**", reply_markup=ForceReply(selective=True))
+
+# Step 2: Handle the file after user replies
+@app.on_message(filters.reply & filters.document)
 async def host_script(client, message):
     user_id = message.from_user.id
 
@@ -55,17 +68,25 @@ async def host_script(client, message):
         await message.reply_text("❌ **You must join the channel first!**")
         return
 
-    if not message.reply_to_message or not message.reply_to_message.document:
-        await message.reply_text("❌ **Reply to a .py file with /host to host it.**")
-        return
-
-    file = message.reply_to_message.document
+    file = message.document
     if not file.file_name.endswith(".py"):
         await message.reply_text("❌ **Only .py files are allowed!**")
         return
 
     if user_id not in hosted_scripts:
         hosted_scripts[user_id] = []
+
+    # Restrict normal users to 2 scripts
+    if user_id not in approved_users and user_id not in ADMINS and len(hosted_scripts[user_id]) >= 2:
+        await message.reply_text("❌ **You can only host 2 scripts!** Request admin approval for unlimited hosting.")
+        return
+
+    file_path = await message.download()
+    process = await asyncio.create_subprocess_exec("python3", file_path)
+
+    hosted_scripts[user_id].append({"file": file_path, "process": process})
+    await message.reply_text(f"✅ **Hosting `{file.file_name}` successfully!**")
+
 
     # Restrict normal users to 2 scripts
     if user_id not in approved_users and user_id not in ADMINS and len(hosted_scripts[user_id]) >= 2:
