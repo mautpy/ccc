@@ -82,8 +82,25 @@ async def host_script(client, message):
 @app.on_message(filters.command("stop"))
 async def stop_script(client, message):
     user_id = message.from_user.id
-    user_scripts = hosted_scripts.get(user_id, [])
+    command_parts = message.text.split()
 
+    # If admin provides a user ID, stop that user's script
+    if user_id in ADMINS and len(command_parts) > 1:
+        try:
+            target_user = int(command_parts[1])
+            if target_user in hosted_scripts and hosted_scripts[target_user]:
+                script_info = hosted_scripts[target_user].pop()
+                script_info["process"].terminate()
+                os.remove(script_info["file"])
+                await message.reply_text(f"✅ **Stopped a script for user `{target_user}`.**")
+            else:
+                await message.reply_text("❌ **No active scripts found for this user.**")
+        except ValueError:
+            await message.reply_text("❌ **Invalid user ID.**")
+        return
+
+    # Normal user stopping their own script
+    user_scripts = hosted_scripts.get(user_id, [])
     if not user_scripts:
         await message.reply_text("❌ **You have no active scripts.**")
         return
@@ -92,6 +109,7 @@ async def stop_script(client, message):
     script_info["process"].terminate()
     os.remove(script_info["file"])
     await message.reply_text("✅ **Your script has been stopped.**")
+
 
 # Restart hosted script
 @app.on_message(filters.command("restart"))
