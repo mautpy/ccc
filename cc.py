@@ -18,11 +18,12 @@ approved_users = set()  # Users approved for unlimited script hosting
 async def is_user_joined(client, user_id):
     try:
         user = await client.get_chat_member(CHANNEL_ID, user_id)
-        return user.status in ["member", "administrator", "creator"]
-    except:
+        return user.status not in ["left", "kicked"]
+    except Exception as e:
+        print(f"Error checking user membership: {e}")
         return False
 
-# Start command
+# Start command with channel join button
 @app.on_message(filters.command("start"))
 async def start(client, message):
     buttons = InlineKeyboardMarkup([
@@ -39,7 +40,8 @@ async def start(client, message):
 # Callback for checking channel join
 @app.on_callback_query(filters.regex("check"))
 async def check_channel(client, callback_query):
-    if await is_user_joined(client, callback_query.from_user.id):
+    user_id = callback_query.from_user.id
+    if await is_user_joined(client, user_id):
         await callback_query.answer("✅ You have joined! You can now use the bot.", show_alert=True)
     else:
         await callback_query.answer("❌ You haven't joined the channel yet!", show_alert=True)
@@ -53,25 +55,28 @@ async def host_script(client, message):
         await message.reply_text("❌ **You must join the channel first!**")
         return
 
-    if message.reply_to_message and message.reply_to_message.document:
-        file = message.reply_to_message.document
-        if not file.file_name.endswith(".py"):
-            await message.reply_text("❌ **Only .py files are allowed!**")
-            return
+    if not message.reply_to_message or not message.reply_to_message.document:
+        await message.reply_text("❌ **Reply to a .py file with /host to host it.**")
+        return
 
-        if user_id not in hosted_scripts:
-            hosted_scripts[user_id] = []
+    file = message.reply_to_message.document
+    if not file.file_name.endswith(".py"):
+        await message.reply_text("❌ **Only .py files are allowed!**")
+        return
 
-        # Restrict normal users to 2 scripts
-        if user_id not in approved_users and user_id not in ADMINS and len(hosted_scripts[user_id]) >= 2:
-            await message.reply_text("❌ **You can only host 2 scripts!** Request admin approval for unlimited hosting.")
-            return
+    if user_id not in hosted_scripts:
+        hosted_scripts[user_id] = []
 
-        file_path = await message.reply_to_message.download()
-        process = await asyncio.create_subprocess_exec("python3", file_path)
+    # Restrict normal users to 2 scripts
+    if user_id not in approved_users and user_id not in ADMINS and len(hosted_scripts[user_id]) >= 2:
+        await message.reply_text("❌ **You can only host 2 scripts!** Request admin approval for unlimited hosting.")
+        return
 
-        hosted_scripts[user_id].append({"file": file_path, "process": process})
-        await message.reply_text(f"✅ **Hosting `{file.file_name}` successfully!**")
+    file_path = await message.reply_to_message.download()
+    process = await asyncio.create_subprocess_exec("python3", file_path)
+
+    hosted_scripts[user_id].append({"file": file_path, "process": process})
+    await message.reply_text(f"✅ **Hosting `{file.file_name}` successfully!**")
 
 # Stop hosted script
 @app.on_message(filters.command("stop"))
@@ -79,13 +84,14 @@ async def stop_script(client, message):
     user_id = message.from_user.id
     user_scripts = hosted_scripts.get(user_id, [])
 
-    if user_scripts:
-        script_info = user_scripts.pop()
-        script_info["process"].terminate()
-        os.remove(script_info["file"])
-        await message.reply_text("✅ **Your script has been stopped.**")
-    else:
+    if not user_scripts:
         await message.reply_text("❌ **You have no active scripts.**")
+        return
+
+    script_info = user_scripts.pop()
+    script_info["process"].terminate()
+    os.remove(script_info["file"])
+    await message.reply_text("✅ **Your script has been stopped.**")
 
 # Restart hosted script
 @app.on_message(filters.command("restart"))
@@ -93,15 +99,16 @@ async def restart_script(client, message):
     user_id = message.from_user.id
     user_scripts = hosted_scripts.get(user_id, [])
 
-    if user_scripts:
-        script_info = user_scripts[0]
-        script_info["process"].terminate()
-        await asyncio.sleep(1)  # Ensure process is stopped
-        process = await asyncio.create_subprocess_exec("python3", script_info["file"])
-        script_info["process"] = process
-        await message.reply_text("✅ **Script restarted successfully.**")
-    else:
+    if not user_scripts:
         await message.reply_text("❌ **No active script found to restart.**")
+        return
+
+    script_info = user_scripts[0]
+    script_info["process"].terminate()
+    await asyncio.sleep(1)  # Ensure process is stopped
+    process = await asyncio.create_subprocess_exec("python3", script_info["file"])
+    script_info["process"] = process
+    await message.reply_text("✅ **Script restarted successfully.**")
 
 # Approve user for unlimited hosting (Admins only)
 @app.on_message(filters.command("approve") & filters.user(ADMINS))
