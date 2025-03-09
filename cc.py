@@ -71,13 +71,7 @@ async def start(client, message):
     user_id = message.from_user.id
     save_user(user_id)  
 
-    buttons = InlineKeyboardMarkup([
-        [InlineKeyboardButton("DEVLOPER MAUT", url="https://t.me/+DDVmus7_7u44YjQ1")
-        [InlineKeyboardButton("📢 Join Channel", url="https://t.me/+IqNvYhiEpRkwZWY9")],
-        [InlineKeyboardButton("📢 Join Channel", url="https://t.me/+R7Goos2tRVU1YmE0"),
-        InlineKeyboardButton("📢 Join Channel", url="https://t.me/how_2_use")],
-        [InlineKeyboardButton("✅ Check", callback_data="check")]
-    ])
+    buttons = InlineKeyboardMarkup([ [InlineKeyboardButton("DEVLOPER MAUT", url="https://t.me/+DDVmus7_7u44YjQ1"), InlineKeyboardButton("📢 Join Channel", url="https://t.me/+IqNvYhiEpRkwZWY9")], [InlineKeyboardButton("📢 Join Channel", url="https://t.me/+R7Goos2tRVU1YmE0"), InlineKeyboardButton("📢 Join Channel", url="https://t.me/how_2_use")], [InlineKeyboardButton("✅ Check", callback_data="check")] ])
 
     image_url = "https://t.me/seedhe_maut_owner9/34"  
 
