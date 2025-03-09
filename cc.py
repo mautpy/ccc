@@ -33,10 +33,12 @@ def get_total_users():
 async def is_user_joined(client, user_id):
     try:
         user = await client.get_chat_member(CHANNEL_ID, user_id)
-        return user.status in ["member", "administrator", "creator"]
+        if user.status in ["member", "administrator", "creator"]:
+            return True
+        return False
     except Exception as e:
         print(f"Error checking user {user_id}: {e}")  # Debugging log
-        return False  # Assume not joined if any error occurs
+        return True  # Assume user is joined to prevent false negatives
 
 # Function to calculate bot uptime
 def get_uptime():
