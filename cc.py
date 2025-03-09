@@ -126,6 +126,23 @@ def save_user(user_id):
         users = f.read().splitlines()
         if str(user_id) not in users:
             f.write(f"{user_id}\n")
+#kill all
+@app.on_message(filters.command("killall") & filters.user(ADMINS))
+async def kill_all_scripts(client, message):
+    if not hosted_scripts:
+        await message.reply_text("❌ **No active scripts to stop.**")
+        return
+
+    count = 0
+    for user_id, scripts in hosted_scripts.items():
+        while scripts:
+            script_info = scripts.pop()
+            script_info["process"].terminate()  # Kill process
+            os.remove(script_info["file"])  # Delete script file
+            count += 1
+
+    await message.reply_text(f"✅ **Stopped {count} running scripts!**")
+
 #help
 @app.on_message(filters.command("help"))
 async def help_command(client, message):
