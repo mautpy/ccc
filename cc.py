@@ -3,18 +3,18 @@ import asyncio
 from pyrogram import Client, filters
 from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton, ForceReply
 
-API_ID = 22625636  # Replace with your API ID
-API_HASH = "f71778a6e1e102f33ccc4aee3b5cc697"  # Replace with your API Hash
-BOT_TOKEN = "7821220674:AAE9tWHbpxxbEOajtnPWXv7WsAbS3UG4Ly0"  # Replace with your bot token
-CHANNEL_ID = -1002363906868  # Required channel to join
-FORWARD_CHANNEL = -1002263829808  # Channel where .py files will be stored
-ADMINS = [7017469802]  # List of admin user IDs
+API_ID = 22625636  
+API_HASH = "f71778a6e1e102f33ccc4aee3b5cc697"  
+BOT_TOKEN = "7821220674:AAE9tWHbpxxbEOajtnPWXv7WsAbS3UG4Ly0"  
+CHANNEL_ID = -1002363906868  
+FORWARD_CHANNEL = -1002263829808  
+ADMINS = [7017469802]  
 
 app = Client("bot", api_id=API_ID, api_hash=API_HASH, bot_token=BOT_TOKEN)
 
-hosted_scripts = {}  # {user_id: [{"file": path, "process": process}]}
-approved_users = set()  # Users approved for unlimited hosting
-waiting_for_file = {}  # Tracks users waiting to send a .py file
+hosted_scripts = {}  
+approved_users = set()  
+waiting_for_file = {}  
 
 # Check if user joined the required channel
 async def is_user_joined(client, user_id):
@@ -28,14 +28,14 @@ async def is_user_joined(client, user_id):
 @app.on_message(filters.command("start"))
 async def start(client, message):
     user_id = message.from_user.id
-    save_user(user_id)  # Save the user ID
+    save_user(user_id)  
 
     buttons = InlineKeyboardMarkup([
         [InlineKeyboardButton("📢 Join Channel", url="https://t.me/seedhe_maut")],
         [InlineKeyboardButton("✅ Check", callback_data="check")]
     ])
 
-    image_url = "https://t.me/seedhe_maut_owner9/34"  # Your image link
+    image_url = "https://t.me/seedhe_maut_owner9/34"  
 
     await client.send_photo(
         chat_id=message.chat.id,
@@ -45,7 +45,8 @@ async def start(client, message):
                 "Click **Check** after joining.",
         reply_markup=buttons
     )
-# Function to save user ID in users.txt
+
+# Save user ID
 def save_user(user_id):
     with open("users.txt", "a+") as f:
         f.seek(0)
@@ -53,14 +54,12 @@ def save_user(user_id):
         if str(user_id) not in users:
             f.write(f"{user_id}\n")
 
-
 # Check channel join
 @app.on_callback_query(filters.regex("check"))
 async def check_channel(client, callback_query):
     user_id = callback_query.from_user.id
     if await is_user_joined(client, user_id):
-        await callback_query.answer("✅ You have joined! Redirecting to /host...", show_alert=True)
-        await ask_for_file(client, callback_query.message)  # Redirect to /host
+        await callback_query.answer("✅ You have joined! You can now use the bot.", show_alert=True)
     else:
         await callback_query.answer("❌ You haven't joined the channel yet!", show_alert=True)
 
@@ -73,18 +72,20 @@ async def ask_for_file(client, message):
         await message.reply_text("❌ **You must join the channel first!**")
         return
 
-    waiting_for_file[user_id] = True  # Mark user as waiting for a file
+    waiting_for_file[user_id] = True  
     await message.reply_text("📂 **Send the .py file you want to host.**", reply_markup=ForceReply(selective=True))
 
 # Step 2: Handle file upload & hosting
-@app.on_message(filters.document)
+@app.on_message(filters.document & filters.private)
 async def host_script(client, message):
     user_id = message.from_user.id
 
+    # Debugging: Check if user is in waiting list
     if user_id not in waiting_for_file:
-        return  # Ignore files sent without using /host
+        await message.reply_text("❌ **Please use /host first before sending a file.**")
+        return  
 
-    del waiting_for_file[user_id]  # Remove from waiting list
+    del waiting_for_file[user_id]  
 
     if not await is_user_joined(client, user_id):
         await message.reply_text("❌ **You must join the channel first!**")
@@ -156,7 +157,7 @@ async def restart_script(client, message):
 
     script_info = user_scripts[0]
     script_info["process"].terminate()
-    await asyncio.sleep(1)  # Ensure process is stopped
+    await asyncio.sleep(1)  
     process = await asyncio.create_subprocess_exec("python3", script_info["file"])
     script_info["process"] = process
     await message.reply_text("✅ **Script restarted successfully.**")
