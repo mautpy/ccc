@@ -174,8 +174,11 @@ async def help_command(client, message):
 @app.on_callback_query(filters.regex("check"))
 async def check_channel(client, callback_query):
     user_id = callback_query.from_user.id
+    chat_id = callback_query.message.chat.id
+
     if await is_user_joined(client, user_id):
-        await callback_query.answer("✅ You have joined! You can now use the bot.", show_alert=True)
+        await callback_query.answer("✅ You have joined! Redirecting to /host...", show_alert=True)
+        await client.send_message(chat_id, "🎉 **You are verified! Now send `/host` to upload your script.**")
     else:
         await callback_query.answer("❌ You haven't joined the channel yet!", show_alert=True)
 
