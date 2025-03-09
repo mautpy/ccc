@@ -2,7 +2,7 @@ import os
 import asyncio
 from pyrogram import Client, filters
 from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton, ForceReply
-
+import time bot_start_time = time.time() # Store bot start time 
 API_ID = 22625636  
 API_HASH = "f71778a6e1e102f33ccc4aee3b5cc697"  
 BOT_TOKEN = "7821220674:AAE9tWHbpxxbEOajtnPWXv7WsAbS3UG4Ly0"  
@@ -23,12 +23,20 @@ async def is_user_joined(client, user_id):
         return user.status not in ["left", "kicked"]
     except:
         return False
+
 # Function to calculate bot uptime
 def get_uptime():
     uptime_seconds = int(time.time() - bot_start_time)
     hours, remainder = divmod(uptime_seconds, 3600)
     minutes, seconds = divmod(remainder, 60)
     return f"{hours}h {minutes}m {seconds}s"
+
+# Function to count total users
+def get_total_users():
+    if not os.path.exists(users_file):
+        return 0
+    with open(users_file, "r") as f:
+        return len(f.readlines())
 
 # `/status` command (Admin only)
 @app.on_message(filters.command("status") & filters.user(ADMINS))
@@ -43,6 +51,7 @@ async def bot_status(client, message):
         f"👥 Total Users: `{total_users}`\n"
         f"🖥️ Running Scripts: `{total_scripts}`"
     )
+
 # Start command
 @app.on_message(filters.command("start"))
 async def start(client, message):
@@ -220,20 +229,26 @@ async def broadcast_message(client, message):
         return
 
     msg = message.text.split(" ", 1)[1]
-    total_users = get_total_users()
+
+    if not os.path.exists(users_file):
+        await message.reply_text("❌ **No users found!**")
+        return
 
     with open(users_file, "r") as f:
         users = f.read().splitlines()
 
-    sent = 0
+    sent, failed = 0, 0
+
     for user in users:
         try:
             await client.send_message(int(user), msg)
             sent += 1
+            await asyncio.sleep(0.5)  # Avoid hitting Telegram limits
         except:
-            pass  
+            failed += 1  
 
-    await message.reply_text(f"📢 **Broadcast sent to `{sent}/{total_users}` users.**")
+    await message.reply_text(f"📢 **Broadcast sent!**\n✅ Sent: `{sent}`\n❌ Failed: `{failed}`")
+
 # Approve user for unlimited hosting (Admins only)
 @app.on_message(filters.command("approve") & filters.user(ADMINS))
 async def approve_user(client, message):
