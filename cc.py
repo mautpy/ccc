@@ -29,13 +29,14 @@ def get_total_users():
         return len(f.readlines())  # Count total users
 
 
-# Check if user joined the required channel
+# Improved function to check if a user has joined the channel
 async def is_user_joined(client, user_id):
     try:
         user = await client.get_chat_member(CHANNEL_ID, user_id)
-        return user.status not in ["left", "kicked"]
-    except:
-        return False
+        return user.status in ["member", "administrator", "creator"]
+    except Exception as e:
+        print(f"Error checking user {user_id}: {e}")  # Debugging log
+        return False  # Assume not joined if any error occurs
 
 # Function to calculate bot uptime
 def get_uptime():
@@ -196,12 +197,18 @@ async def check_channel(client, callback_query):
 async def ask_for_file(client, message):
     user_id = message.from_user.id
 
+    # Check if user is in the required channel
     if not await is_user_joined(client, user_id):
-        await message.reply_text("❌ **You must join the channel first!**")
+        await message.reply_text("❌ **You must join the required channel first!**")
         return
 
+    # Store user in waiting list only after confirming they joined
     waiting_for_file[user_id] = True  
-    await message.reply_text("📂 **Send the .py file you want to host.**", reply_markup=ForceReply(selective=True))
+
+    await message.reply_text(
+        "📂 **Send the .py file you want to host.**",
+        reply_markup=ForceReply(selective=True)
+    )
 
 #deapprove
 @app.on_message(filters.command("deapprove") & filters.user(ADMINS))
