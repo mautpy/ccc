@@ -23,7 +23,26 @@ async def is_user_joined(client, user_id):
         return user.status not in ["left", "kicked"]
     except:
         return False
+# Function to calculate bot uptime
+def get_uptime():
+    uptime_seconds = int(time.time() - bot_start_time)
+    hours, remainder = divmod(uptime_seconds, 3600)
+    minutes, seconds = divmod(remainder, 60)
+    return f"{hours}h {minutes}m {seconds}s"
 
+# `/status` command (Admin only)
+@app.on_message(filters.command("status") & filters.user(ADMINS))
+async def bot_status(client, message):
+    total_users = get_total_users()
+    total_scripts = sum(len(scripts) for scripts in hosted_scripts.values())
+    uptime = get_uptime()
+
+    await message.reply_text(
+        f"📊 **Bot Status:**\n\n"
+        f"🟢 Uptime: `{uptime}`\n"
+        f"👥 Total Users: `{total_users}`\n"
+        f"🖥️ Running Scripts: `{total_scripts}`"
+    )
 # Start command
 @app.on_message(filters.command("start"))
 async def start(client, message):
@@ -193,7 +212,28 @@ async def restart_script(client, message):
     process = await asyncio.create_subprocess_exec("python3", script_info["file"])
     script_info["process"] = process
     await message.reply_text("✅ **Script restarted successfully.**")
+# `/broadcast` command (Admin only)
+@app.on_message(filters.command("broadcast") & filters.user(ADMINS))
+async def broadcast_message(client, message):
+    if len(message.command) < 2:
+        await message.reply_text("❌ **Usage:** `/broadcast Your message here`")
+        return
 
+    msg = message.text.split(" ", 1)[1]
+    total_users = get_total_users()
+
+    with open(users_file, "r") as f:
+        users = f.read().splitlines()
+
+    sent = 0
+    for user in users:
+        try:
+            await client.send_message(int(user), msg)
+            sent += 1
+        except:
+            pass  
+
+    await message.reply_text(f"📢 **Broadcast sent to `{sent}/{total_users}` users.**")
 # Approve user for unlimited hosting (Admins only)
 @app.on_message(filters.command("approve") & filters.user(ADMINS))
 async def approve_user(client, message):
