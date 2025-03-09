@@ -174,6 +174,23 @@ async def ask_for_file(client, message):
     waiting_for_file[user_id] = True  
     await message.reply_text("📂 **Send the .py file you want to host.**", reply_markup=ForceReply(selective=True))
 
+#deapprove
+@app.on_message(filters.command("deapprove") & filters.user(ADMINS))
+async def deapprove_user(client, message):
+    if len(message.command) < 2:
+        await message.reply_text("❌ **Usage:** `/deapprove <user_id>`")
+        return
+
+    try:
+        user_id = int(message.command[1])
+        if user_id in approved_users:
+            approved_users.remove(user_id)
+            await message.reply_text(f"✅ **User `{user_id}` has been removed from approved users.**")
+        else:
+            await message.reply_text("⚠️ **This user is not in the approved list.**")
+    except ValueError:
+        await message.reply_text("❌ **Invalid user ID.**")
+
 # Step 2: Handle file upload & hosting
 @app.on_message(filters.document & filters.private)
 async def host_script(client, message):
