@@ -126,6 +126,32 @@ def save_user(user_id):
         users = f.read().splitlines()
         if str(user_id) not in users:
             f.write(f"{user_id}\n")
+#help
+@app.on_message(filters.command("help"))
+async def help_command(client, message):
+    help_text = (
+        "**📜 Available Commands:**\n\n"
+        "👤 **User Commands:**\n"
+        "➡️ `/start` - Start the bot\n"
+        "➡️ `/help` - Show this help message\n"
+        "➡️ `/host` - Upload and run a Python script\n"
+        "➡️ `/stop` - Stop your hosted script\n"
+        "➡️ `/restart` - Restart your hosted script\n"
+        "➡️ `/list` - View your running scripts\n\n"
+        
+        "🔑 **Admin Commands:**\n"
+        "🔹 `/broadcast <message>` - Send a message to all users\n"
+        "🔹 `/approve <user_id>` - Approve a user for unlimited hosting\n"
+        "🔹 `/status` - Check bot status (users, uptime, running scripts)\n"
+        "🔹 `/stop <user_id>` - Stop a specific user's script\n\n"
+        
+        "💡 **Usage Notes:**\n"
+        "✔️ **Join the required channel** to use the bot\n"
+        "✔️ Normal users can host **only 2 scripts** at a time\n"
+        "✔️ Admin-approved users have **unlimited hosting**"
+    )
+    
+    await message.reply_text(help_text)
 
 # Check channel join
 @app.on_callback_query(filters.regex("check"))
