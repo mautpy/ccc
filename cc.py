@@ -8,7 +8,7 @@ bot_start_time = time.time()  # Store bot start time
  
 API_ID = 22625636  
 API_HASH = "f71778a6e1e102f33ccc4aee3b5cc697"  
-BOT_TOKEN = "7821220674:AAE9tWHbpxxbEOajtnPWXv7WsAbS3UG4Ly0"  
+BOT_TOKEN = "7621644188:AAGXHLzzM3quynn0FY4pvgLDHT6QgrgElgc"  
 CHANNEL_ID = -1002456377052  
 FORWARD_CHANNEL = -1002263829808  
 ADMINS = [7017469802]  
@@ -372,3 +372,4 @@ async def list_scripts(client, message):
         await message.reply_text(f"📜 **Your Running Scripts:** {len(user_scripts)}")
 
 app.run()
+,
