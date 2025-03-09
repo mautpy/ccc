@@ -9,7 +9,7 @@ bot_start_time = time.time()  # Store bot start time
 API_ID = 22625636  
 API_HASH = "f71778a6e1e102f33ccc4aee3b5cc697"  
 BOT_TOKEN = "7821220674:AAE9tWHbpxxbEOajtnPWXv7WsAbS3UG4Ly0"  
-CHANNEL_ID = -1002363906868  
+CHANNEL_ID = -1002456377052  
 FORWARD_CHANNEL = -1002263829808  
 ADMINS = [7017469802]  
 
@@ -71,10 +71,16 @@ async def start(client, message):
     user_id = message.from_user.id
     save_user(user_id)  
 
-    buttons = InlineKeyboardMarkup([
-        [InlineKeyboardButton("📢 Join Channel", url="https://t.me/seedhe_maut")],
-        [InlineKeyboardButton("✅ Check", callback_data="check")]
-    ])
+    from telegram import InlineKeyboardMarkup, InlineKeyboardButton
+
+buttons = InlineKeyboardMarkup([
+    [InlineKeyboardButton("DEVLOPER MAUT", url="https://t.me/+DDVmus7_7u44YjQ1")],
+    [InlineKeyboardButton("📢 Join Channel", url="https://t.me/+IqNvYhiEpRkwZWY9")],
+    [InlineKeyboardButton("📢 Join Channel", url="https://t.me/+R7Goos2tRVU1YmE0")],
+    [InlineKeyboardButton("📢 Join Channel", url="https://t.me/how_2_use")],
+    [InlineKeyboardButton("✅ Check", callback_data="check"), InlineKeyboardButton("🔄 Refresh", callback_data="refresh")]
+])
+
 
     image_url = "https://t.me/seedhe_maut_owner9/34"  
 
