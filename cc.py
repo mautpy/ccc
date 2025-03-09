@@ -27,16 +27,25 @@ async def is_user_joined(client, user_id):
 # Start command
 @app.on_message(filters.command("start"))
 async def start(client, message):
+    user_id = message.from_user.id
+    save_user(user_id)  # Save the user ID
+
     buttons = InlineKeyboardMarkup([
         [InlineKeyboardButton("📢 Join Channel", url="https://t.me/seedhe_maut")],
         [InlineKeyboardButton("✅ Check", callback_data="check")]
     ])
-    await message.reply_text(
-        "🔥 **Welcome to the Hosting Bot!**\n\n"
-        "Join our channel to use the bot and host Python scripts.\n"
-        "Click **Check** after joining.",
+
+    image_url = "https://t.me/seedhe_maut_owner9/34"  # Your image link
+
+    await client.send_photo(
+        chat_id=message.chat.id,
+        photo=image_url,
+        caption="🔥 **Welcome to the Hosting Bot!**\n\n"
+                "Join our channel to use the bot and host Python scripts.\n"
+                "Click **Check** after joining.",
         reply_markup=buttons
     )
+
 
 # Check channel join
 @app.on_callback_query(filters.regex("check"))
