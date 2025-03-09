@@ -71,16 +71,13 @@ async def start(client, message):
     user_id = message.from_user.id
     save_user(user_id)  
 
-    from telegram import InlineKeyboardMarkup, InlineKeyboardButton
-
-buttons = InlineKeyboardMarkup([
-    [InlineKeyboardButton("DEVLOPER MAUT", url="https://t.me/+DDVmus7_7u44YjQ1")],
-    [InlineKeyboardButton("📢 Join Channel", url="https://t.me/+IqNvYhiEpRkwZWY9")],
-    [InlineKeyboardButton("📢 Join Channel", url="https://t.me/+R7Goos2tRVU1YmE0")],
-    [InlineKeyboardButton("📢 Join Channel", url="https://t.me/how_2_use")],
-    [InlineKeyboardButton("✅ Check", callback_data="check"), InlineKeyboardButton("🔄 Refresh", callback_data="refresh")]
-])
-
+    buttons = InlineKeyboardMarkup([
+        [InlineKeyboardButton("DEVLOPER MAUT", url="https://t.me/+DDVmus7_7u44YjQ1")],
+        [InlineKeyboardButton("📢 Join Channel", url="https://t.me/+IqNvYhiEpRkwZWY9")],
+        [InlineKeyboardButton("📢 Join Channel", url="https://t.me/+R7Goos2tRVU1YmE0")],
+        [InlineKeyboardButton("📢 Join Channel", url="https://t.me/how_2_use")],
+        [InlineKeyboardButton("✅ Check", callback_data="check"), InlineKeyboardButton("🔄 Refresh", callback_data="refresh")]
+    ])
 
     image_url = "https://t.me/seedhe_maut_owner9/34"  
 
@@ -92,6 +89,7 @@ buttons = InlineKeyboardMarkup([
                 "Click **Check** after joining.",
         reply_markup=buttons
     )
+
 # Install PIP if missing
 async def ensure_pip():
     try:
