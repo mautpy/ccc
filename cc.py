@@ -95,7 +95,6 @@ async def start(client, message):
         reply_markup=buttons
     )
 
-
 # Install PIP if missing
 async def ensure_pip():
     try:
