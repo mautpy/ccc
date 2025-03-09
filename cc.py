@@ -71,25 +71,31 @@ async def start(client, message):
     user_id = message.from_user.id
     save_user(user_id)  
 
-    buttons = InlineKeyboardMarkup([
-        [InlineKeyboardButton("DEVLOPER MAUT", url="https://t.me/+DDVmus7_7u44YjQ1"),
-         InlineKeyboardButton("📢 Join Channel", url="https://t.me/+IqNvYhiEpRkwZWY9")],  
-        [InlineKeyboardButton("📢 Join Channel", url="https://t.me/+R7Goos2tRVU1YmE0"),
-         InlineKeyboardButton("📢 Join Channel", url="https://t.me/how_2_use")],  
-        [InlineKeyboardButton("✅ Check", callback_data="check")]  
-    ])
+buttons = InlineKeyboardMarkup([
+    [InlineKeyboardButton("DEVLOPER MAUT", url="https://t.me/+DDVmus7_7u44YjQ1"),
+     InlineKeyboardButton("📢 Join Channel", url="https://t.me/+IqNvYhiEpRkwZWY9")],  
+    [InlineKeyboardButton("📢 Join Channel", url="https://t.me/+R7Goos2tRVU1YmE0"),
+     InlineKeyboardButton("📢 Join Channel", url="https://t.me/how_2_use")],  
+    [InlineKeyboardButton("✅ Check", callback_data="check")]  
+])
+
 
     image_url = "https://t.me/seedhe_maut_owner9/34"  
 
     await client.send_photo(
         chat_id=message.chat.id,
         photo=image_url,
-        caption="🔥 **Welcome to the Hosting Bot!**\n\n"
-                "Join our channel to use the bot and host Python scripts.\n"
-                "Click **Check** after joining.",
+        caption = (
+    "🔥 **Welcome to the Hosting Bot!**\n\n"
+    "To use this bot and host Python scripts, you must join our channel.\n\n"
+    "👤 **Developer:** @seedhe_maut_bot\n"
+    "📌 Use **/help** to see all commands.\n"
+    "🚀 Start hosting with **/host**.\n\n"
+    "✅ Click **Check** after joining!"
+,
+
         reply_markup=buttons
     )
-
 
 # Install PIP if missing
 async def ensure_pip():
