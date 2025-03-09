@@ -59,7 +59,8 @@ def save_user(user_id):
 async def check_channel(client, callback_query):
     user_id = callback_query.from_user.id
     if await is_user_joined(client, user_id):
-        await callback_query.answer("✅ You have joined! You can now use the bot.", show_alert=True)
+        await callback_query.answer("✅ You have joined! Redirecting to /host...", show_alert=True)
+        await ask_for_file(client, callback_query.message)  # Redirect to /host
     else:
         await callback_query.answer("❌ You haven't joined the channel yet!", show_alert=True)
 
