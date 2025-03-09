@@ -131,11 +131,6 @@ async def pip_install(client, message):
     
     await message.reply_text(f"✅ `{package_name}` installed successfully!")
     
-    #new
-    @app.on_message(filters.command("get_id") & filters.user(ADMINS))
-async def get_chat_id(client, message):
-    chat = await client.get_chat("@how_2_use")
-    await message.reply_text(f"Channel ID: `{chat.id}`")
 
 # Save user ID
 def save_user(user_id):
