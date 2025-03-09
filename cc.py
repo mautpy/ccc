@@ -19,6 +19,16 @@ hosted_scripts = {}
 approved_users = set()  
 waiting_for_file = {}  
 
+
+users_file = "users.txt"  # Define the user file
+
+def get_total_users():
+    if not os.path.exists(users_file):
+        return 0  # Return 0 if file doesn't exist
+    with open(users_file, "r") as f:
+        return len(f.readlines())  # Count total users
+
+
 # Check if user joined the required channel
 async def is_user_joined(client, user_id):
     try:
