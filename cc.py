@@ -8,7 +8,7 @@ bot_start_time = time.time()  # Store bot start time
  
 API_ID = 22625636  
 API_HASH = "f71778a6e1e102f33ccc4aee3b5cc697"  
-BOT_TOKEN = "7621644188:AAGXHLzzM3quynn0FY4pvgLDHT6QgrgElgc"  
+BOT_TOKEN = "7821220674:AAE9tWHbpxxbEOajtnPWXv7WsAbS3UG4Ly0"  
 CHANNEL_ID = -1002456377052  
 FORWARD_CHANNEL = -1002263829808  
 ADMINS = [7017469802]  
@@ -32,13 +32,12 @@ def get_total_users():
 # Improved function to check if a user has joined the channel
 async def is_user_joined(client, user_id):
     try:
-        user = await client.get_chat_member(CHANNEL_ID, user_id)
-        if user.status in ["member", "administrator", "creator"]:
-            return True
-        return False
+        member = await client.get_chat_member(CHANNEL_ID, user_id)
+        return member.status in ["member", "administrator", "creator"]
     except Exception as e:
-        print(f"Error checking user {user_id}: {e}")  # Debugging log
-        return True  # Assume user is joined to prevent false negatives
+        print(f"Error checking user {user_id}: {e}")
+        return False  # Ensure strict enforcement
+
 
 # Function to calculate bot uptime
 def get_uptime():
@@ -131,6 +130,13 @@ async def pip_install(client, message):
     await process.communicate()
     
     await message.reply_text(f"✅ `{package_name}` installed successfully!")
+    
+    #new
+    @app.on_message(filters.command("get_id") & filters.user(ADMINS))
+async def get_chat_id(client, message):
+    chat = await client.get_chat("@how_2_use")
+    await message.reply_text(f"Channel ID: `{chat.id}`")
+
 # Save user ID
 def save_user(user_id):
     with open("users.txt", "a+") as f:
@@ -193,6 +199,7 @@ async def check_channel(client, callback_query):
         await client.send_message(chat_id, "🎉 **You are verified! Now send `/host` to upload your script.**")
     else:
         await callback_query.answer("❌ You haven't joined the channel yet!", show_alert=True)
+
 
 # Step 1: Ask user to send a .py file
 @app.on_message(filters.command("host"))
