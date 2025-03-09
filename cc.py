@@ -2,7 +2,10 @@ import os
 import asyncio
 from pyrogram import Client, filters
 from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton, ForceReply
-import time bot_start_time = time.time() # Store bot start time 
+import time
+
+bot_start_time = time.time()  # Store bot start time
+ 
 API_ID = 22625636  
 API_HASH = "f71778a6e1e102f33ccc4aee3b5cc697"  
 BOT_TOKEN = "7821220674:AAE9tWHbpxxbEOajtnPWXv7WsAbS3UG4Ly0"  
