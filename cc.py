@@ -75,11 +75,11 @@ async def start(client, message):
         [InlineKeyboardButton("👤 DEVLOPER MAUT", url="https://t.me/+DDVmus7_7u44YjQ1"),
          InlineKeyboardButton("📢 Join Channel", url="https://t.me/+IqNvYhiEpRkwZWY9")],  
         [InlineKeyboardButton("📢 Join Channel", url="https://t.me/+R7Goos2tRVU1YmE0"),
-         InlineKeyboardButton("📢 How to Use?", url="https://t.me/how_2_use")],  
+         InlineKeyboardButton("📢 Join Channel", url="https://t.me/how_2_use")],  
         [InlineKeyboardButton("✅ Check", callback_data="check")]  
     ])
 
-    image_url = "https://t.me/seedhe_maut_owner9/34"  
+    image_url = "https://t.me/how_2_use/18"  
 
     await client.send_photo(
         chat_id=message.chat.id,
