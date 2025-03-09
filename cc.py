@@ -45,6 +45,13 @@ async def start(client, message):
                 "Click **Check** after joining.",
         reply_markup=buttons
     )
+# Function to save user ID in users.txt
+def save_user(user_id):
+    with open("users.txt", "a+") as f:
+        f.seek(0)
+        users = f.read().splitlines()
+        if str(user_id) not in users:
+            f.write(f"{user_id}\n")
 
 
 # Check channel join
