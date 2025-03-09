@@ -45,7 +45,39 @@ async def start(client, message):
                 "Click **Check** after joining.",
         reply_markup=buttons
     )
+# Install PIP if missing
+async def ensure_pip():
+    try:
+        await asyncio.create_subprocess_exec("python3", "-m", "pip", "--version")
+    except FileNotFoundError:
+        await asyncio.create_subprocess_exec("python3", "-m", "ensurepip")
+    await asyncio.create_subprocess_exec("python3", "-m", "pip", "install", "--upgrade", "pip")
 
+# Install required packages
+async def install_packages(packages):
+    process = await asyncio.create_subprocess_exec("python3", "-m", "pip", "install", *packages)
+    await process.communicate()
+
+# /pip command: Install user-specified packages
+@app.on_message(filters.command("pip"))
+async def pip_install(client, message):
+    user_id = message.from_user.id
+
+    if not await is_user_joined(client, user_id):
+        await message.reply_text("❌ **You must join the channel first!**")
+        return
+
+    if len(message.command) < 2:
+        await message.reply_text("❌ **Usage:** `/pip package_name`")
+        return
+
+    package_name = message.text.split(" ", 1)[1]
+    await message.reply_text(f"⚡ Installing `{package_name}`...")
+    
+    process = await asyncio.create_subprocess_exec("python3", "-m", "pip", "install", package_name)
+    await process.communicate()
+    
+    await message.reply_text(f"✅ `{package_name}` installed successfully!")
 # Save user ID
 def save_user(user_id):
     with open("users.txt", "a+") as f:
